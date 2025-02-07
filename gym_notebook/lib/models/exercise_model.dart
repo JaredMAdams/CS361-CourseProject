@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class ExerciseModel {
   String name;
   String primary;

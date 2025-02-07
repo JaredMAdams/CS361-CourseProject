@@ -24,6 +24,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
+  void _deleteExercise(index) {
+    setState(
+      () => exercises.removeAt(index),
+    );
+  }
+
   // Called when adding a new exercise to the current workout.
   void _newExercise(exercise) async {
     // If back button is clicked on the Exercise List page, don't try to add a new item.
@@ -32,10 +38,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
       WorkoutExerciseModel newEx = WorkoutExerciseModel(exercise, 0, 0);
 
       // Open the Modal to update the new exercise's reps/weight.
-      var x = await _openWorkoutExercise(newEx);
+      var x = await _openWorkoutExerciseModal(newEx);
 
       // Update the exercises list state to include the newly added exercise.
-      _addExercise(x);
+      if (x != null && x[1] != -1) {
+        _addExercise(x[0]);
+      }
     }
   }
 
@@ -44,8 +52,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
   // The function takes in a WorkoutExercise object, containing and exercise, reps, and weight.
   // The function returns a Future object which contains the WorkoutExercise which was passed to it, with updated values for reps/weight.
   // The function is run asynchronously so that the caller can update the state of exercises.
-  Future _openWorkoutExercise(exercise) async {
+  Future _openWorkoutExerciseModal(exercise) async {
     return await showModalBottomSheet(
+      isDismissible: false,
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
@@ -81,6 +90,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
         );
       },
     );
+  }
+
+  void _reorderWorkoutExercises(oldIndex, newIndex) {
+    setState(() {
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+      final WorkoutExerciseModel item = exercises.removeAt(oldIndex);
+      exercises.insert(newIndex, item);
+    });
   }
 
   @override
@@ -151,9 +170,15 @@ class _WorkoutPageState extends State<WorkoutPage> {
           ],
         ),
         Expanded(
-          child: ExerciseList(
+          // child: ExerciseList(
+          //   exercises: exercises,
+          //   openExercise: _openWorkoutExercise,
+          // ),
+          child: ReorderableExerciseList(
             exercises: exercises,
-            openExercise: _openWorkoutExercise,
+            openExercise: _openWorkoutExerciseModal,
+            reorderList: _reorderWorkoutExercises,
+            deleteExercise: _deleteExercise,
           ),
         ),
       ],
@@ -180,41 +205,86 @@ Route _navigateExerciseList() {
       });
 }
 
-class ExerciseList extends StatelessWidget {
-  const ExerciseList({
+// class ExerciseList extends StatelessWidget {
+//   const ExerciseList({
+//     super.key,
+//     required this.exercises,
+//     required this.openExercise,
+//   });
+
+//   final List<WorkoutExerciseModel> exercises;
+//   final Function openExercise;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.separated(
+//       physics: BouncingScrollPhysics(),
+//       shrinkWrap: true,
+//       itemCount: exercises.length,
+//       itemBuilder: (context, index) {
+//         return ExerciseTile(
+//           exercise: exercises[index],
+//           openExercise: openExercise,
+
+//         );
+//       },
+//       separatorBuilder: (context, index) => SizedBox(
+//         height: 10,
+//       ),
+//     );
+//   }
+// }
+
+class ReorderableExerciseList extends StatelessWidget {
+  const ReorderableExerciseList({
     super.key,
     required this.exercises,
     required this.openExercise,
+    required this.reorderList,
+    required this.deleteExercise,
   });
 
   final List<WorkoutExerciseModel> exercises;
+
+  // Used in widget
+  final Function reorderList;
+
+  // Passed to children
   final Function openExercise;
+  final Function deleteExercise;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      physics: BouncingScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: exercises.length,
-      itemBuilder: (context, index) {
-        return ExerciseTile(
-          exercise: exercises[index],
-          openExercise: openExercise,
-        );
-      },
-      separatorBuilder: (context, index) => SizedBox(
-        height: 10,
-      ),
-    );
+    return ReorderableListView(
+        onReorder: (int oldIndex, int newIndex) {
+          reorderList(oldIndex, newIndex);
+        },
+        children: <Widget>[
+          for (int index = 0; index < exercises.length; index += 1)
+            ExerciseTile(
+              key: Key('$index'),
+              exercise: exercises[index],
+              openExercise: openExercise,
+              deleteExercise: deleteExercise,
+              index: index,
+            ),
+        ]);
   }
 }
 
 class ExerciseTile extends StatelessWidget {
-  const ExerciseTile(
-      {super.key, required this.exercise, required this.openExercise});
+  const ExerciseTile({
+    super.key,
+    required this.exercise,
+    required this.openExercise,
+    required this.index,
+    required this.deleteExercise,
+  });
 
   final WorkoutExerciseModel exercise;
   final Function openExercise;
+  final Function deleteExercise;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +302,13 @@ class ExerciseTile extends StatelessWidget {
           ),
         ),
         trailing: ElevatedButton(
-          onPressed: () => openExercise(exercise),
+          onPressed: () async {
+            var x = await openExercise(exercise);
+
+            if (x != null && x[1] == -1) {
+              deleteExercise(index);
+            }
+          },
           child: Icon(Icons.arrow_forward_ios),
         ),
       ),

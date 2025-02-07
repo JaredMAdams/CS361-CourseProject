@@ -79,6 +79,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blue,
+          centerTitle: true,
+          title: const Text("My Gym Notebook"),
+          actions: [
+            IconButton(
+              onPressed: () => print("Hello World"),
+              icon: Icon(Icons.info_outlined),
+            ),
+          ],
+        ),
         backgroundColor: Theme.of(context).colorScheme.tertiaryFixedDim,
         bottomNavigationBar: NavigationBar(
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

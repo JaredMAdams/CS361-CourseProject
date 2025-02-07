@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:word_pair/models/workout_exercise_model.dart';
 
 const List<int> list = <int>[1, 2, 3, 4, 5, 6];
@@ -77,7 +76,7 @@ class _ExercisePageState extends State<WorkoutExercisePage> {
                     ),
                     iconSize: 30,
                   ),
-                  onPressed: () => Navigator.pop(context, exercise),
+                  onPressed: () => Navigator.pop(context, [exercise, 0]),
                   child: Icon(Icons.keyboard_arrow_down),
                 ),
               ),
@@ -111,7 +110,116 @@ class _ExercisePageState extends State<WorkoutExercisePage> {
           WeightRow(
             weight: exercise.weight,
             adjustWeight: _adjustWeight,
-          )
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          DeleteExercise()
+        ],
+      ),
+    );
+  }
+}
+
+class DeleteExercise extends StatelessWidget {
+  const DeleteExercise({
+    super.key,
+  });
+
+  Future _dialogBuilder(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Delete Exercise?",
+            textAlign: TextAlign.center,
+          ),
+          content: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+              ),
+              children: [
+                TextSpan(
+                    text: 'By clicking "Confirm", you acknowledge that you '
+                        'would like to delete this exercise from your workout.\n\n'),
+                TextSpan(
+                  text: 'Note: This action cannot be undone.',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 'By clicking the "Confirm" button, you acknowledge\n'
+          //   'that you would like to delete this exercise from your workout.\n\n'
+          //   'Note: This action cannot be undone.'),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      Colors.grey[300],
+                    ),
+                  ),
+                  child: Text(
+                    "Cancel",
+                  ),
+                  onPressed: () => Navigator.of(context).pop([null, 0]),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      Colors.grey[400],
+                    ),
+                  ),
+                  child: Text(
+                    "Confirm",
+                    style: TextStyle(color: Colors.red[800]),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(-1),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      margin: EdgeInsets.fromLTRB(20, 100, 20, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.red[700]),
+              ),
+              onPressed: () async {
+                var x = await _dialogBuilder(context);
+                if (x == -1) {
+                  Navigator.pop(context, [null, -1]);
+                }
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
