@@ -53,7 +53,7 @@ class _ExercisePageState extends State<WorkoutExercisePage> {
   void _adjustWeight(newWeight) {
     setState(
       () {
-        if (exercise.weight < 0) {
+        if (newWeight < 0) {
           return;
         }
         exercise.weight = newWeight;
@@ -357,7 +357,14 @@ class WeightRow extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () => adjustWeight(weight - 1),
-                onLongPress: () => adjustWeight(weight - 5),
+                onLongPress: () {
+                  int offset = weight % 5;
+                  if (offset == 0) {
+                    adjustWeight(weight - 5);
+                  } else {
+                    adjustWeight(weight - offset);
+                  }
+                },
                 child: Icon(Icons.arrow_back_ios_new_outlined),
               ),
               SizedBox(

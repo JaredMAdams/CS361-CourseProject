@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 // Page Imports
 import './pages/workout_page/workout.dart';
 import 'package:word_pair/pages/profile_page/profile.dart';
+import 'package:word_pair/pages/home_page/home_page.dart';
+
+import 'pages/help_page/help_page.dart';
 
 // Widget Imports
 
@@ -85,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text("My Gym Notebook"),
           actions: [
             IconButton(
-              onPressed: () => print("Hello World"),
+              onPressed: () => Navigator.of(context).push(_navigateHelpPage()),
               icon: Icon(Icons.info_outlined),
             ),
           ],
@@ -124,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: IndexedStack(
           index: index,
           children: <Widget>[
-            Placeholder(),
+            HomePage(),
             WorkoutPage(),
             ProfilePage(),
           ],
@@ -132,4 +135,22 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+Route _navigateHelpPage() {
+  return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => HelpPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1, 0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+        final tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      });
 }

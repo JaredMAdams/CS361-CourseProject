@@ -5,87 +5,105 @@ class ExerciseListPage extends StatefulWidget {
   const ExerciseListPage({
     super.key,
     this.exercises,
+    this.exerciseFilter,
   });
 
   final List<ExerciseModel>? exercises;
+  final List<String>? exerciseFilter;
 
   @override
   State<ExerciseListPage> createState() => _ExerciseListPageState();
 }
 
 class _ExerciseListPageState extends State<ExerciseListPage> {
-  ExerciseModel dbBenchPress = ExerciseModel(
-    "Dumbbell Bench Press",
-    "Chest",
-    ["Triceps", "Shoulders"],
-  );
-  ExerciseModel inclineDbBenchPress = ExerciseModel(
-    "Incline Dumbbell Bench Press",
-    "Chest",
-    ["Triceps", "Shoulders"],
-  );
-  ExerciseModel dbPullover = ExerciseModel(
-    "Dumbbell Pullover",
-    "Chest",
-    ["Lats"],
-  );
-  ExerciseModel dbFlyes = ExerciseModel(
-    "Dumbbell Flyes",
-    "Chest",
-    ["Shoulders", "Triceps"],
-  );
-  ExerciseModel declineDbBenchPress = ExerciseModel(
-    "Decline Dumbell Bench Press",
-    "Chest",
-    ["Triceps", "Shoulders"],
-  );
-  ExerciseModel standingDbCurl = ExerciseModel(
-    "Standing Dumbbell Curl",
-    "Biceps",
-    [],
-  );
-  ExerciseModel seatedHammerCurl = ExerciseModel(
-    "Seated Hammer Curl",
-    "Bicep",
-    ["Forearms"],
-  );
-  ExerciseModel preacherCurls = ExerciseModel(
-    "Preacher Curls",
-    "Biceps",
-    ["secondary"],
-  );
-  ExerciseModel overhandBarbellCurl = ExerciseModel(
-    "Overhand Barbell Curl",
-    "Bicep",
-    ["Forearms"],
-  );
-  ExerciseModel seatedCableRow = ExerciseModel(
-    "Seated Cable Row",
-    "Upper Back",
-    ["Biceps", "Lats", "Shoulders"],
-  );
-  ExerciseModel bentOverRow = ExerciseModel(
-    "Bent Over Row",
-    "Upper Back",
-    ["Abs", "Biceps", "Lats", "Lower Back", "Shoulders"],
-  );
+  List<ExerciseModel> exercises = [
+    ExerciseModel(
+      "Dumbbell Bench Press",
+      "Chest",
+      ["Triceps", "Shoulders"],
+    ),
+    ExerciseModel(
+      "Incline Dumbbell Bench Press",
+      "Chest",
+      ["Triceps", "Shoulders"],
+    ),
+    ExerciseModel(
+      "Dumbbell Pullover",
+      "Chest",
+      ["Lats"],
+    ),
+    ExerciseModel(
+      "Dumbbell Flyes",
+      "Chest",
+      ["Shoulders", "Triceps"],
+    ),
+    ExerciseModel(
+      "Decline Dumbell Bench Press",
+      "Chest",
+      ["Triceps", "Shoulders"],
+    ),
+    ExerciseModel(
+      "Standing Dumbbell Curl",
+      "Biceps",
+      [],
+    ),
+    ExerciseModel(
+      "Seated Hammer Curl",
+      "Biceps",
+      ["Forearms"],
+    ),
+    ExerciseModel(
+      "Preacher Curls",
+      "Biceps",
+      ["secondary"],
+    ),
+    ExerciseModel(
+      "Overhand Barbell Curl",
+      "Biceps",
+      ["Forearms"],
+    ),
+    ExerciseModel(
+      "Seated Cable Row",
+      "Upper Back",
+      ["Biceps", "Lats", "Shoulders"],
+    ),
+    ExerciseModel(
+      "Bent Over Row",
+      "Upper Back",
+      ["Abs", "Biceps", "Lats", "Lower Back", "Shoulders"],
+    ),
+  ];
 
-  List<ExerciseModel> exercises = [];
+  List<ExerciseModel> exerciseList = [];
+
+  List<String> exercisesFilter = [];
+
+  void filterExerciseList(key) {
+    setState(
+      () {
+        if (key == "All") {
+          exerciseList = [];
+          exerciseList.addAll(exercises);
+        } else {
+          exerciseList = [];
+          for (var i in exercises) {
+            if (i.primary == key) {
+              exerciseList.add(i);
+            }
+          }
+        }
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    exercises.add(dbBenchPress);
-    exercises.add(inclineDbBenchPress);
-    exercises.add(dbPullover);
-    exercises.add(dbFlyes);
-    exercises.add(declineDbBenchPress);
-    exercises.add(standingDbCurl);
-    exercises.add(seatedHammerCurl);
-    exercises.add(preacherCurls);
-    exercises.add(overhandBarbellCurl);
-    exercises.add(seatedCableRow);
-    exercises.add(bentOverRow);
+    filterExerciseList("All");
+    exercisesFilter.add("All");
+    exercisesFilter.add("Chest");
+    exercisesFilter.add("Biceps");
+    exercisesFilter.add("Upper Back");
   }
 
   @override
@@ -103,15 +121,24 @@ class _ExerciseListPageState extends State<ExerciseListPage> {
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.arrow_back),
                 ),
-                // actions: [
-                //   ElevatedButton(
-                //       onPressed: () => print(exercises[1].primary),
-                //       child: Icon(Icons.access_time_filled_outlined))
-                // ],
+                actions: [
+                  DropdownButton(
+                      items: exercisesFilter.map((String exercise) {
+                        return DropdownMenuItem(
+                          value: exercise,
+                          child: Text(
+                            exercise,
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (v) {
+                        filterExerciseList(v);
+                      }),
+                ],
               ),
               Expanded(
                 child: Exercises(
-                  exercises: exercises,
+                  exercises: exerciseList,
                 ),
               ),
             ],
@@ -176,6 +203,37 @@ class ExerciseTile extends StatelessWidget {
           child: Icon(Icons.add),
         ),
       ),
+    );
+  }
+}
+
+class ExerciseFilter extends StatefulWidget {
+  const ExerciseFilter({
+    super.key,
+    required this.exerciseList,
+  });
+
+  final List exerciseList;
+
+  @override
+  State<ExerciseFilter> createState() => _ExerciseFilterState();
+}
+
+class _ExerciseFilterState extends State<ExerciseFilter> {
+  List<String> exercisesFilter = [
+    "All",
+    "Chest",
+    "Biceps",
+    "Upper Back",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu(
+      initialSelection: "All",
+      dropdownMenuEntries: exercisesFilter.map((String exercise) {
+        return DropdownMenuEntry(label: exercise, value: exercise);
+      }).toList(),
     );
   }
 }
