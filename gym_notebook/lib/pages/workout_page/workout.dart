@@ -148,7 +148,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             Container(
               margin: EdgeInsets.fromLTRB(20, 10, 0, 0),
               child: Text(
-                "Primary Muscles: Chest, Triceps",
+                "Primary Muscles: Chest",
                 style: TextStyle(
                   fontSize: 18,
                 ),
@@ -161,7 +161,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             Container(
               margin: EdgeInsets.fromLTRB(20, 10, 0, 0),
               child: Text(
-                "Secondary Muscles: ",
+                "Secondary Muscles: Triceps",
                 style: TextStyle(
                   fontSize: 18,
                 ),

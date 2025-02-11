@@ -358,9 +358,9 @@ class WeightRow extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => adjustWeight(weight - 1),
                 onLongPress: () {
-                  int offset = weight % 5;
+                  int offset = weight % 10;
                   if (offset == 0) {
-                    adjustWeight(weight - 5);
+                    adjustWeight(weight - 10);
                   } else {
                     adjustWeight(weight - offset);
                   }
@@ -399,9 +399,9 @@ class WeightRow extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => adjustWeight(weight + 1),
                 onLongPress: () {
-                  int offset = weight % 5;
+                  int offset = weight % 10;
 
-                  adjustWeight(weight + (5 - offset));
+                  adjustWeight(weight + (10 - offset));
                 },
                 child: Icon(Icons.arrow_forward_ios_outlined),
               ),
